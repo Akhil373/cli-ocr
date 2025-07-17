@@ -10,9 +10,8 @@ from pyperclip import copy
 ss_path = r"C:\Users\akhil\OneDrive\Pictures\Screenshots"
 
 class _ScreenshotHandler(FileSystemEventHandler):
-    def __init__(self, existing_files):
+    def __init__(self):
         super().__init__()
-        self.existing_files = existing_files
         self.new_image = None
 
     def on_created(self, event):
@@ -21,19 +20,13 @@ class _ScreenshotHandler(FileSystemEventHandler):
         f = os.path.basename(event.src_path)
         image_extensions = {'.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff'}
         if any(f.lower().endswith(ext) for ext in image_extensions):
-            if f not in self.existing_files:
-                self.new_image = event.src_path
+            self.new_image = event.src_path
 
-def get_existing_files(directory):
-    if not os.path.exists(directory):
-        return set()
-    return set(os.listdir(directory))
-
-def wait_for_new_screenshot(directory, existing_files, timeout=30):
+def wait_for_new_screenshot(directory, timeout=30):
     if not os.path.exists(directory):
         return None
 
-    handler = _ScreenshotHandler(existing_files)
+    handler = _ScreenshotHandler()
     observer = Observer()
     observer.schedule(handler, directory, recursive=False)
     observer.start()
@@ -50,7 +43,6 @@ def wait_for_new_screenshot(directory, existing_files, timeout=30):
         print("Timeout: No new screenshot detected")
     return handler.new_image
 
-
 def OCR(image_path):
     load_dotenv()
     model = NANONETSOCR()
@@ -66,15 +58,14 @@ def snip_and_ocr():
         print(f"Screenshots directory does not exist: {screenshots_dir}")
         return None
     
-    existing_files = get_existing_files(screenshots_dir)
-    print(f"Found {len(existing_files)} existing files in screenshots directory")
+    print("Waiting for new screenshot...")
     try:
         subprocess.run('start ms-screenclip:', shell=True, check=True)
     except subprocess.CalledProcessError:
         print("Failed to open snipping tool.")
         return None
     
-    new_screenshot = wait_for_new_screenshot(screenshots_dir, existing_files)
+    new_screenshot = wait_for_new_screenshot(screenshots_dir)
     
     if new_screenshot is None:
         print("No new screenshot detected.")
