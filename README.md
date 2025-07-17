@@ -6,7 +6,7 @@ A simple Python utility to perform Optical Character Recognition (OCR) on a scre
 ## Prerequisites
 
   * Python 3.12+
-  * A [Nanonets OCR API Key](https://www.google.com/search?q=https://app.nanonets.com/%23/keys)
+  * A [Nanonets OCR API Key](https://app.nanonets.com/#/keys?utm_source=wrapper)
   * (Optional) [uv](https://github.com/astral-sh/uv) - An extremely fast Python package installer and resolver.
 
 
